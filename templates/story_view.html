@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Story{% endblock %}
+{% block content %}
+<style>
+.story-view {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+.story-view img {
+    max-height: 90%;
+    max-width: 90%;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+</style>
+
+<div class="story-view">
+    <img src="{{ story.image.url }}" alt="Story">
+</div>
+{% endblock %}

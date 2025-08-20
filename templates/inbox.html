@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<div class="dm-inbox">
+    <h2 style="margin:0 0 12px 0;">Messages</h2>
+
+    {% if partners %}
+        <h3 style="margin:8px 0;">Recent Chats</h3>
+        <div class="dm-list">
+            {% for p in partners %}
+                <a class="dm-item" href="{% url 'dm_thread' p.username %}">
+                    <div class="dm-avatar"></div>
+                    <div class="dm-meta">
+                        <div class="dm-name">{{ p.username }}</div>
+                        <div class="dm-last">
+                            {% if last_by_partner.p.username %}
+                                {{ last_by_partner.p.username.body|truncatechars:50 }}
+                            {% else %}
+                                Start a conversation →
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No conversations yet. Find a friend and start chatting!</p>
+    {% endif %}
+
+    <hr style="margin:20px 0;">
+
+    <h3 style="margin:8px 0;">All Users</h3>
+
+    <!-- 🔎 Search bar -->
+    <input type="text" id="userSearch" placeholder="Search users..." 
+           style="width:100%; padding:8px; margin-bottom:12px; border:1px solid #dbdbdb; border-radius:6px;">
+
+    <div class="dm-list" id="userList">
+        {% for u in all_users %}
+            <a class="dm-item" href="{% url 'dm_thread' u.username %}" data-username="{{ u.username|lower }}">
+                <div class="dm-avatar"></div>
+                <div class="dm-meta">
+                    <div class="dm-name">{{ u.username }}</div>
+                    <div class="dm-last">Send a message →</div>
+                </div>
+            </a>
+        {% empty %}
+            <p>No users found.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.dm-list { display:flex; flex-direction:column; gap:8px; }
+.dm-item {
+    display:flex; gap:10px; align-items:center;
+    background:#fff; border:1px solid #dbdbdb; border-radius:8px; padding:10px;
+    text-decoration:none; color:#262626;
+}
+.dm-item:hover { background:#fafafa; }
+.dm-avatar {
+    width:40px; height:40px; border-radius:50%;
+    background: linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5);
+}
+.dm-meta { display:flex; flex-direction:column; }
+.dm-name { font-weight:600; }
+.dm-last { font-size:13px; color:#777; }
+</style>
+
+<script>
+document.getElementById("userSearch").addEventListener("keyup", function() {
+    let filter = this.value.toLowerCase();
+    let users = document.querySelectorAll("#userList .dm-item");
+
+    users.forEach(function(user) {
+        let username = user.dataset.username;
+        if (username.includes(filter)) {
+            user.style.display = "flex";
+        } else {
+            user.style.display = "none";
+        }
+    });
+});
+</script>
+{% endblock %}
+
+

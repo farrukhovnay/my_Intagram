@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block title %}Feed{% endblock %}
+{% block content %}
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        background: #fafafa;
+    }
+
+    .feed {
+        max-width: 600px;
+        margin: 30px auto;
+    }
+
+    .stories-container {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding: 10px;
+        margin-bottom: 20px;
+        background: #fff;
+        border: 1px solid #dbdbdb;
+        border-radius: 12px;
+    }
+
+    .stories-container img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid red;
+        object-fit: cover;
+    }
+
+    .post {
+        background: #fff;
+        border: 1px solid #dbdbdb;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .post-header {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-bottom: 1px solid #efefef;
+    }
+
+    .post-header img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 12px;
+        border: 1px solid #ddd;
+    }
+
+    .post-header h3 {
+        font-size: 15px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .post img.post-image {
+        width: 100%;
+        display: block;
+    }
+
+    .post-actions {
+        display: flex;
+        gap: 15px;
+        padding: 10px 12px;
+        font-size: 22px;
+    }
+
+    .post-actions a {
+        cursor: pointer;
+        transition: transform 0.2s;
+        text-decoration: none;
+        color: black;
+    }
+
+    .post-actions a:hover {
+        transform: scale(1.2);
+    }
+
+    .post-content {
+        padding: 0 12px 12px;
+    }
+
+    .likes {
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+    .caption {
+        margin-top: 5px;
+        font-size: 14px;
+        color: #262626;
+    }
+</style>
+
+<div class="feed">
+
+<div class="stories-container">
+
+    <div style="text-align: center;">
+        {% if request.user.is_authenticated %}
+            <div onclick="askToAddStory()" style="cursor: pointer;">
+                {% if request.user.profile.avatar %}
+                    <img src="{{ request.user.profile.avatar.url }}" alt="My story"
+                         style="border-radius: 50%; width: 60px; height: 60px;">
+                {% else %}
+                    <img src="/static/default-avatar.png" alt="My story"
+                         style="border-radius: 50%; width: 60px; height: 60px;">
+                {% endif %}
+                <p style="font-size: 12px;">Story</p>
+            </div>
+        {% endif %}
+    </div>
+
+    {% for story in stories %}
+    <div style="text-align: center;">
+        <a href="{% url 'view_story' story.id %}">
+            <img src="{{ story.image.url }}" alt="Story"
+                 style="border-radius: 50%; width: 60px; height: 60px;">
+        </a>
+        <p style="font-size: 12px;">{{ story.user.username }}</p>
+    </div>
+{% endfor %}
+
+</div>
+
+
+<form id="storyForm" method="POST" enctype="multipart/form-data" action="{% url 'add_story' %}" style="display:none;">
+    {% csrf_token %}
+    <input type="file" id="storyInput" name="image" accept="image/*" onchange="document.getElementById('storyForm').submit()">
+</form>
+
+<script>
+function askToAddStory() {
+    let result = confirm("Do you want to add a story (image)?");
+    if (result) {
+        document.getElementById("storyInput").click(); 
+    } 
+    
+}
+</script>
+
+    
+</div>
+
+
+    
+    {% for post in posts %}
+        <div class="post">
+            <div class="post-header">
+                <img src="{{ post.user.profile.avatar.url }}" alt="User avatar">
+                <h3>{{ post.user.username }}</h3>
+            </div>
+
+            <a href="{% url 'detail' post.id %}">
+                <img src="{{ post.image.url }}" alt="Post image" class="post-image">
+            </a>
+
+            <div class="post-actions">
+                <a href="{% url 'like_post' post.id %}">❤️</a>
+                <a href="{% url 'detail' post.id %}">💬</a>
+            </div>
+
+            <div class="post-content">
+                <p class="likes">{{ post.post_likes.count }} 1 likes</p>
+                <p class="caption"><b>{{ post.user.username }}</b> {{ post.caption }}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+
+

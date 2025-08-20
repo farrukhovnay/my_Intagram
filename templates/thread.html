@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Chat with {{ other.username }}{% endblock %}
+{% block content %}
+<style>
+.dm-thread {
+    max-width: 600px;
+    margin: 20px auto;
+    background: #fff;
+    border: 1px solid #dbdbdb;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+.dm-messages {
+    flex: 1;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+.msg {
+    padding: 8px 12px;
+    border-radius: 12px;
+    margin: 5px 0;
+    max-width: 70%;
+}
+.me {
+    background: #0095f6;
+    color: white;
+    align-self: flex-end;
+}
+.other {
+    background: #efefef;
+    align-self: flex-start;
+}
+</style>
+
+<div class="dm-thread">
+    <h3>Chat with {{ other.username }}</h3>
+
+    <div class="dm-messages">
+        {% for msg in messages_qs %}
+            <div class="msg {% if msg.sender == request.user %}me{% else %}other{% endif %}">
+                {{ msg.body }}
+            </div>
+        {% empty %}
+            <p style="color:gray;">No messages yet.</p>
+        {% endfor %}
+    </div>
+
+    <form method="POST" action="{% url 'dm_send' other.username %}">
+        {% csrf_token %}
+        {{ form.body }}
+        <button type="submit">Send</button>
+    </form>
+</div>
+{% endblock %}
