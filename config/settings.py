@@ -1,13 +1,27 @@
 from pathlib import Path
 import os
+import socket
+from dotenv import load_dotenv
+
+# Загружаем переменные из .env (если есть)
+load_dotenv()
 
 # Базовая директория проекта
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Безопасность
-SECRET_KEY = 'django-insecure-@f7_pcokfnq^zl_ee0+2i$o9!w@afemii09gff067uvw(t+1_0'
-DEBUG = True
-ALLOWED_HOSTS = []
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "fallback-secret-key")
+DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
+
+# ALLOWED_HOSTS для локала, GitHub и PythonAnywhere
+hostname = socket.gethostname()
+if hostname == 'your-local-computer-name':  # замени на имя своего ПК
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+else:
+    ALLOWED_HOSTS = [
+        'yasminafaruxovnay.pythonanywhere.com',
+        '127.0.0.1'
+    ]
 
 # Приложения
 INSTALLED_APPS = [
@@ -17,6 +31,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Твои приложения
     'users',
     'post',
 ]
@@ -42,6 +58,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -52,7 +69,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# База данных (SQLite)
+# База данных (SQLite по умолчанию, можно поменять на PostgreSQL позже)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -74,17 +91,23 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Статические файлы
+# =======================
+# ⚡️ Статика
+# =======================
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # для collectstatic
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # твои исходники
 
-# Медиа файлы
+# =======================
+# ⚡️ Медиа
+# =======================
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# =======================
 # Логин
+# =======================
 LOGIN_URL = 'login'
 
-# Поля по умолчанию
+# По умолчанию
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
