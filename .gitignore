@@ -1,13 +1,24 @@
 # Python
-*.pyc
 __pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.egg
+
+# Virtual environment
+venv/
+.env
 
 # Django
 db.sqlite3
 /staticfiles/
 /media/
 
-# VSCode
+# VSCode / PyCharm
 .vscode/
+.idea/
+*.swp
+*.swo
 
-venv/
